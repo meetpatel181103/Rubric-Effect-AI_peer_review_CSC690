@@ -1,0 +1,51 @@
+{
+  "rubric_id": "eng101-v1",
+  "name": "English Composition 101",
+  "version": "1.0.0",
+  "description": "Intro writing rubric focusing on clarity, structure, evidence, and mechanics.",
+  "criteria": [
+    {
+      "id": "thesis",
+      "name": "Thesis & Focus",
+      "description": "Clarity and specificity of the main argument; sustained focus throughout.",
+      "weight": 0.30,
+      "scale": { "min": 0, "max": 4, "labels": ["Poor","Fair","Adequate","Good","Excellent"] },
+      "performance_levels": [
+        { "score": 0, "descriptor": "No clear thesis; unfocused." },
+        { "score": 2, "descriptor": "Some thesis; uneven focus." },
+        { "score": 4, "descriptor": "Clear, specific thesis; sustained focus." }
+      ]
+    },
+    {
+      "id": "organization",
+      "name": "Organization & Coherence",
+      "description": "Logical structure, paragraph unity, and transitions.",
+      "weight": 0.25,
+      "scale": { "min": 0, "max": 4 },
+      "performance_levels": [
+        { "score": 0, "descriptor": "Disorganized; no clear structure." },
+        { "score": 2, "descriptor": "Partial structure; weak transitions." },
+        { "score": 4, "descriptor": "Logical, coherent structure with strong transitions." }
+      ]
+    },
+    {
+      "id": "evidence",
+      "name": "Evidence & Analysis",
+      "description": "Use of evidence, integration of sources, and depth of analysis.",
+      "weight": 0.30,
+      "scale": { "min": 0, "max": 4 },
+      "performance_levels": [
+        { "score": 0, "descriptor": "Assertions without support; little analysis." },
+        { "score": 2, "descriptor": "Some evidence; limited analysis." },
+        { "score": 4, "descriptor": "Compelling evidence and strong analysis; sources integrated well." }
+      ]
+    },
+    {
+      "id": "mechanics",
+      "name": "Style & Mechanics",
+      "description": "Grammar, syntax, tone, and sentence variety appropriate for an academic audience.",
+      "weight": 0.15,
+      "scale": { "min": 0, "max": 4 }
+    }
+  ]
+}
