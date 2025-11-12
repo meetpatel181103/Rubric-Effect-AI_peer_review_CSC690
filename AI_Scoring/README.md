@@ -13,10 +13,10 @@ This component connects directly with the **FastAPI backend** (`/api/score` endp
 
 ## 📂 Folder Structure
 
-AI_Scoring/
-├── rubrics/ → JSON schemas and example rubrics
-├── prompts/ → Prompt templates and few-shot examples for the LLM
-├── harness/ → Test harness for AI vs. human score comparison
-├── guidelines/ → Usage and fairness documentation
-└── README.md → Overview of Nidhey's AI module and contributions
+AI_Scoring: 
+1.  rubrics/ → JSON schemas and example rubrics
+2.  prompts/ → Prompt templates and few-shot examples for the LLM
+3.  harness/ → Test harness for AI vs. human score comparison
+4.  guidelines/ → Usage and fairness documentation
+5.  README.md → Overview of Nidhey's AI module and contributions
 
