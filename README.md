@@ -2,9 +2,9 @@
 **Capstone Project Proposal — SFSU CSC 698, Fall 2025**
 
 **Team**  
-- Meet Patel — mpatel14@sfsu.edu — 922399891  
-- Pritam Sandhu — psandhu3@sfsu.edu — 922397291  
-- Nidhey Patel — npatel20@sfsu.edu — 922402855
+- Meet Patel 
+- Pritam Sandhu  
+- Nidhey Patel
 
 ---
 
