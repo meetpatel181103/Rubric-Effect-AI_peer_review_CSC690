@@ -1,0 +1,32 @@
+# Few-shot demonstration showing the tone and structure of expected AI feedback output.
+
+essay_excerpt: |
+  Technology always improves society. In every case, when new tech appears, it makes life better for everyone.
+
+rubric_id: "eng101-v1"
+
+ai_feedback: |
+  {
+    "rubric_id": "eng101-v1",
+    "criteria": [
+      { "id": "thesis", "score": 2, "feedback": "Thesis is overly broad; narrow the claim and consider counterexamples." },
+      { "id": "organization", "score": 2, "feedback": "Ideas repeat without clear transitions; add topic sentences." },
+      { "id": "evidence", "score": 1, "feedback": "General claims lack evidence; include concrete examples or data." },
+      { "id": "mechanics", "score": 3, "feedback": "Mostly clear writing with minor repetition; vary sentence structure." }
+    ],
+    "overall_score": 2.0,
+    "comments": [
+      "Refine the argument to avoid universal statements.",
+      "Support assertions with examples or credible sources."
+    ],
+    "weak_paragraph_rewrites": [
+      {
+        "original": "Technology always improves society. In every case, when new tech appears, it makes life better for everyone.",
+        "rewrite": "While many innovations improve quality of life, their effects vary. For example, smartphones expand access to information but also raise privacy concerns.",
+        "rationale": "Adds nuance and includes a concrete example instead of a universal claim."
+      }
+    ],
+    "citation_flags": [
+      { "sentence": "Technology always improves society.", "reason": "This is a sweeping claim that requires evidence or examples." }
+    ]
+  }
