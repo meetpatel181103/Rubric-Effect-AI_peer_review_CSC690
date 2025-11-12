@@ -19,4 +19,4 @@ AI_Scoring:
 3.  harness/ → Test harness for AI vs. human score comparison
 4.  guidelines/ → Usage and fairness documentation
 5.  README.md → Overview of Nidhey's AI module and contributions
-
+6.  docs/ → Functional requirements and other project documentation
