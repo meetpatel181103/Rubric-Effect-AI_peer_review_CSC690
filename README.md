@@ -3,7 +3,7 @@
 
 **Team**  
 - Meet Patel 
-- Pritam Sandhu  
+- Pritham Sandhu  
 - Nidhey Patel
 
 ---
@@ -56,7 +56,7 @@ We won’t collect/store personal data. Testing uses publicly available essays, 
 - DB design and migrations in PostgreSQL; connection pooling, simple caching, and logging.  
 - Security & privacy pass: ephemeral uploads, metadata redaction; document retention choices.
 
-**Pritam — Frontend & UX Lead**  
+**Pritham — Frontend & UX Lead**  
 - Build React + Tailwind UI: upload flow, rubric selector, progress states, and results view (criterion scores, inline highlights, “copyable rewrites”).  
 - Integrate with backend; handle failure states (timeouts, malformed input).  
 - Accessibility & usability: keyboard navigation, clear rubric labeling, empty states, export.  
