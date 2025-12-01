@@ -1,0 +1,159 @@
+/* ───────── APP ROOT ───────── */
+
+.app-root {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f3f4f6; /* light gray page background */
+}
+
+/* ───────── NAVBAR ───────── */
+
+.top-nav {
+  background-color: #111827; /* dark bar at top */
+  color: #f9fafb;
+}
+
+.nav-inner {
+  width: 100%;
+  padding: 0.75rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.nav-logo {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-link {
+  font-size: 0.95rem;
+  text-decoration: none;
+  color: #e5e7eb;
+  opacity: 0.8;
+}
+
+.nav-link:hover {
+  opacity: 1;
+}
+
+.nav-link.active {
+  font-weight: 500;
+  opacity: 1;
+}
+
+.nav-signin {
+  border: 1px solid #4b5563;
+  background: transparent;
+  color: #f9fafb;
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.nav-signin:hover {
+  background-color: #374151;
+}
+
+/* ───────── HERO / JUMBOTRON ───────── */
+
+.hero-section {
+  width: 100%;
+  padding: 4rem 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-card {
+  width: 100%;
+  max-width: 1400px; /* wider main block */
+  background-color: #f9fafb;
+  border-radius: 1.5rem;
+  padding: 3.5rem 3rem;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+  text-align: center;
+}
+
+
+.project-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #1e3a8a; 
+  text-transform: uppercase;
+  margin-bottom: 1.3rem;
+}
+
+
+
+.hero-title {
+  font-size: clamp(2rem, 3vw + 1rem, 2.8rem);
+  margin: 0;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.hero-subtext {
+  font-size: 1.25rem;
+  color: #4b5563;
+  margin-bottom: 2rem;
+}
+
+.hero-cta {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.98rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+}
+
+.hero-cta:hover {
+  background-color: #1d4ed8;
+}
+
+.privacy-note {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* ───────── RESPONSIVE TWEAKS ───────── */
+
+@media (max-width: 768px) {
+  .nav-inner {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .nav-links {
+    flex-basis: 100%;
+    justify-content: center;
+  }
+
+  .hero-card {
+    padding: 2.5rem 1.75rem;
+    border-radius: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.9rem;
+  }
+
+  .hero-section {
+    padding: 3rem 1rem;
+  }
+}
