@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import './App.css'
+import EssayUploadSection from './EssayUploadSection.jsx'
+
 
 const RUBRICS = [
   {
@@ -142,6 +144,7 @@ function RubricModal({ rubric, onClose }) {
 
 function App() {
   const [activeRubric, setActiveRubric] = useState(null)
+  const [selectedRubric, setSelectedRubric] = useState(null)
 
   return (
     <div className="app-root">
@@ -223,8 +226,10 @@ function App() {
             {RUBRICS.map((rubric) => (
               <div
                 key={rubric.id}
-                className="rubric-card"
+                className={`rubric-card ${selectedRubric?.id === rubric.id ? 'selected' : ''}`}
+                onClick={() => setSelectedRubric(rubric)}
               >
+
                 <h3 className="rubric-title">{rubric.name}</h3>
                 <p className="rubric-focus">{rubric.focus}</p>
                 <p className="rubric-description">{rubric.shortDescription}</p>
@@ -240,6 +245,8 @@ function App() {
         </div>
       </section>
 
+      {/* NEW: essay upload section */}
+      <EssayUploadSection />
 
       {/* Modal */}
       <RubricModal rubric={activeRubric} onClose={() => setActiveRubric(null)} />
