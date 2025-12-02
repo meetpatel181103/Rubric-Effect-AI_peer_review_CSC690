@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import './App.css'
 import EssayUploadSection from './EssayUploadSection.jsx'
 
@@ -145,6 +145,7 @@ function RubricModal({ rubric, onClose }) {
 function App() {
   const [activeRubric, setActiveRubric] = useState(null)
   const [selectedRubric, setSelectedRubric] = useState(null)
+  const rubricsRef = useRef(null)
 
   return (
     <div className="app-root">
@@ -183,7 +184,20 @@ function App() {
             consistent, transparent peer reviewer.
           </p>
 
-          <button className="hero-cta">Get started</button>
+          <button
+            className="hero-cta"
+            onClick={() => {
+              if (rubricsRef.current) {
+                rubricsRef.current.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                })
+              }
+            }}
+          >
+            Get started
+          </button>
+
 
           <p className="privacy-note">
             We don’t store your essays. Everything is processed in this session only.
@@ -220,7 +234,7 @@ function App() {
         </div>
       </section> */}
 
-      <section className="rubrics-section">
+      <section ref={rubricsRef} className="rubrics-section">
         <div className="rubrics-inner">
           <div className="rubrics-grid">
             {RUBRICS.map((rubric) => (
