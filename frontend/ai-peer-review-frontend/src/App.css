@@ -534,3 +534,81 @@
     padding: 2rem 1.5rem;
   }
 }
+
+/* ───────── RESULTS SECTION ───────── */
+
+.results-section {
+  width: 100%;
+  padding: 0 2rem 4rem;
+  display: flex;
+  justify-content: center;
+  scroll-margin-top: 120px;
+}
+
+.results-card {
+  width: 100%;
+  max-width: 1400px;
+  background-color: #ffffff;
+  border-radius: 1.5rem;
+  padding: 2.5rem 2.5rem 2.75rem;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+}
+
+.results-heading {
+  font-size: 1.35rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 1.7rem;
+  color: #111827;
+}
+
+.results-rubric-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.results-table-wrapper {
+  margin-top: 0.5rem;
+  overflow-x: auto;
+}
+
+/* re-use existing .rubric-table & .rubric-criterion-cell styles */
+/* add highlight to indicate current performance level */
+
+.results-table .rubric-level-highlight,
+.results-table td.rubric-level-highlight {
+  background-color: #eef2ff;
+}
+
+/* Advice text */
+
+.results-advice {
+  margin-top: 1.9rem;
+  font-size: 0.98rem;
+  line-height: 1.8;
+  color: #4b5563;
+}
+
+.results-advice strong {
+  color: #111827;
+}
+
+/* Responsive tweaks */
+
+@media (max-width: 640px) {
+  .results-section {
+    padding: 0 1.25rem 3rem;
+    scroll-margin-top: 120px;
+  }
+
+  .results-card {
+    padding: 2rem 1.5rem 2.25rem;
+  }
+
+  .results-heading {
+    font-size: 1.2rem;
+  }
+}
