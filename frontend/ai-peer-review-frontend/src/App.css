@@ -20,28 +20,55 @@
 
 .nav-inner {
 	width: 100%;
-	max-width: 1080px;
+	max-width: 1400px; /* match your site width */
 	margin: 0 auto;
 	padding: 0.75rem 2rem;
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
 	gap: 1.5rem;
 }
 
+/* Make the logo stick fully left */
 .nav-logo {
 	font-weight: 600;
 	font-size: 1.1rem;
+	margin-right: auto; /* ⬅ pushes everything else to the right */
 }
 
+/* Center nav links by removing flex:1 and using auto margins */
 .nav-links {
 	display: flex;
 	gap: 0.5rem;
-	flex: 1;
-	justify-content: center;
+	margin: 0 auto; /* ⬅ centers the middle cluster */
 }
 
-/* Works for both <button> and <a> with className="nav-link" */
+/* Sign in stays fully right */
+.nav-signin {
+	margin-left: auto; /* ⬅ pushes this button completely right */
+	border: 1px solid #4b5563;
+	background: transparent;
+	color: #f9fafb;
+	border-radius: 999px;
+	padding: 0.4rem 0.9rem;
+	font-size: 0.85rem;
+	cursor: pointer;
+	transition: background-color 0.15s ease, color 0.15s ease,
+		border-color 0.15s ease;
+}
+
+.nav-signin:hover {
+	background-color: #e5e7eb;
+	color: #111827;
+	border-color: transparent;
+}
+
+.nav-signin-active {
+	background-color: #e5e7eb;
+	color: #111827;
+	border-color: transparent;
+}
+
+/* unchanged nav-link styles */
 .nav-link {
 	background: transparent;
 	border: none;
@@ -69,35 +96,6 @@
 	color: #111827;
 	opacity: 1;
 	font-weight: 600;
-}
-
-.nav-link:focus-visible {
-	outline: 2px solid #3b82f6;
-	outline-offset: 2px;
-}
-
-.nav-signin {
-	border: 1px solid #4b5563;
-	background: transparent;
-	color: #f9fafb;
-	border-radius: 999px;
-	padding: 0.4rem 0.9rem;
-	font-size: 0.85rem;
-	cursor: pointer;
-	transition: background-color 0.15s ease, color 0.15s ease,
-		border-color 0.15s ease;
-}
-
-.nav-signin:hover {
-	background-color: #e5e7eb;
-	color: #111827;
-	border-color: transparent;
-}
-
-.nav-signin-active {
-	background-color: #e5e7eb;
-	color: #111827;
-	border-color: transparent;
 }
 
 /* ───────── HERO / JUMBOTRON ───────── */
@@ -642,14 +640,9 @@
 /* === ABOUT PAGE STYLES ========================================= */
 
 .about-page {
-	min-height: 100vh;
-	padding: 3rem 1.5rem 4rem;
-	background: radial-gradient(
-		circle at top,
-		#f3f6ff 0,
-		#f6f7fb 40%,
-		#f8fafc 100%
-	);
+	min-height: calc(100vh - 56px); /* account for navbar */
+	padding: 4rem 2rem 4.5rem;
+	background: #f3f4f6;
 	display: flex;
 	justify-content: center;
 	box-sizing: border-box;
@@ -657,61 +650,62 @@
 
 .about-container {
 	width: 100%;
-	max-width: 960px;
+	max-width: 1400px; /* match hero / rubrics / upload */
 }
 
 /* Hero section */
 
 .about-hero {
 	display: flex;
-	flex-direction: column;
-	gap: 1.75rem;
-	padding: 2rem 2.25rem;
-	border-radius: 24px;
-	background: #ffffff;
-	box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
-	margin-bottom: 2.5rem;
+	flex-direction: row;
+	gap: 2.5rem;
+	padding: 3rem 3rem;
+	border-radius: 1.5rem;
+	background: #f9fafb;
+	box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+	margin-bottom: 3rem;
 }
 
 .about-hero-text {
-	max-width: 540px;
+	max-width: 640px;
 }
 
 .about-pill {
 	display: inline-block;
-	font-size: 0.75rem;
-	padding: 0.35rem 0.9rem;
+	font-size: 0.8rem;
+	padding: 0.4rem 1rem;
 	border-radius: 999px;
 	background: #e0ecff;
 	color: #1d4ed8;
 	font-weight: 600;
-	letter-spacing: 0.02em;
-	margin-bottom: 0.75rem;
+	letter-spacing: 0.04em;
+	margin-bottom: 0.9rem;
 }
 
 .about-title {
-	font-size: 2rem;
+	font-size: clamp(2rem, 3vw + 1rem, 2.6rem); /* similar to hero-title */
 	line-height: 1.2;
-	margin: 0 0 0.75rem;
+	margin: 0 0 0.9rem;
 	color: #0f172a;
 }
 
 .about-subtitle {
 	margin: 0;
 	color: #4b5563;
-	font-size: 0.98rem;
+	font-size: 1.02rem;
+	line-height: 1.7;
 }
 
 .about-hero-tags {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.5rem;
-	margin-top: 1.1rem;
+	margin-top: 1.3rem;
 }
 
 .about-hero-tags span {
 	font-size: 0.8rem;
-	padding: 0.3rem 0.7rem;
+	padding: 0.35rem 0.8rem;
 	border-radius: 999px;
 	background: #eff6ff;
 	color: #1d4ed8;
@@ -722,15 +716,15 @@
 .about-hero-card {
 	margin-left: auto;
 	max-width: 360px;
-	padding: 1.25rem 1.5rem;
-	border-radius: 18px;
+	padding: 1.4rem 1.6rem;
+	border-radius: 1.25rem;
 	background: linear-gradient(135deg, #1d4ed8, #4f46e5);
 	color: #f9fafb;
 	font-size: 0.9rem;
 }
 
 .about-hero-card h2 {
-	margin: 0 0 0.5rem;
+	margin: 0 0 0.6rem;
 	font-size: 1.1rem;
 }
 
@@ -747,45 +741,33 @@
 	margin-bottom: 0.2rem;
 }
 
-/* On smaller screens, stack hero vertically */
-@media (max-width: 768px) {
-	.about-hero {
-		padding: 1.5rem 1.4rem;
-	}
-
-	.about-hero-card {
-		margin-left: 0;
-		margin-top: 1rem;
-	}
-}
-
 /* Problem / solution cards */
 
 .about-grid {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 1.5rem;
-	margin-bottom: 2.5rem;
+	gap: 1.75rem;
+	margin-bottom: 3rem;
 }
 
 .about-card {
 	background: #ffffff;
-	border-radius: 20px;
-	padding: 1.4rem 1.6rem;
-	box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-	font-size: 0.92rem;
+	border-radius: 1.5rem;
+	padding: 1.6rem 1.8rem;
+	box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+	font-size: 0.95rem;
 	color: #374151;
 }
 
 .about-card h3 {
 	margin-top: 0;
-	margin-bottom: 0.6rem;
-	font-size: 1.05rem;
+	margin-bottom: 0.7rem;
+	font-size: 1.15rem;
 	color: #111827;
 }
 
 .about-card p {
-	margin-bottom: 0.55rem;
+	margin-bottom: 0.6rem;
 }
 
 .about-list {
@@ -794,25 +776,18 @@
 }
 
 .about-list li {
-	margin-bottom: 0.25rem;
-}
-
-/* Stack cards on small screens */
-@media (max-width: 768px) {
-	.about-grid {
-		grid-template-columns: 1fr;
-	}
+	margin-bottom: 0.3rem;
 }
 
 /* Sections */
 
 .about-section {
-	margin-bottom: 2.5rem;
+	margin-bottom: 3rem;
 }
 
 .about-section-title {
-	font-size: 1.2rem;
-	margin-bottom: 1rem;
+	font-size: 1.5rem;
+	margin-bottom: 1.1rem;
 	color: #111827;
 }
 
@@ -821,21 +796,21 @@
 .about-steps {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: 1rem;
+	gap: 1.2rem;
 }
 
 .about-step {
 	background: #ffffff;
-	border-radius: 18px;
-	padding: 1rem 1.1rem;
-	box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+	border-radius: 1.4rem;
+	padding: 1.1rem 1.2rem;
+	box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 	font-size: 0.9rem;
 	color: #374151;
 }
 
 .about-step h4 {
-	margin: 0.3rem 0 0.25rem;
-	font-size: 0.95rem;
+	margin: 0.4rem 0 0.3rem;
+	font-size: 0.98rem;
 	color: #111827;
 }
 
@@ -843,8 +818,8 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 1.7rem;
-	height: 1.7rem;
+	width: 1.8rem;
+	height: 1.8rem;
 	border-radius: 999px;
 	background: #e0ecff;
 	color: #1d4ed8;
@@ -852,68 +827,81 @@
 	font-weight: 600;
 }
 
-/* Steps responsive */
-@media (max-width: 900px) {
-	.about-steps {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-}
-@media (max-width: 640px) {
-	.about-steps {
-		grid-template-columns: 1fr;
-	}
-}
-
 /* Team */
 
 .about-team {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 1.25rem;
+	gap: 1.4rem;
 }
 
 .about-team-member {
 	background: #ffffff;
-	border-radius: 18px;
-	padding: 1.1rem 1.2rem;
-	box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+	border-radius: 1.4rem;
+	padding: 1.2rem 1.3rem;
+	box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 	font-size: 0.9rem;
 	color: #374151;
 }
 
 .about-team-member h4 {
-	margin: 0 0 0.2rem;
-	font-size: 1rem;
+	margin: 0 0 0.25rem;
+	font-size: 1.02rem;
 	color: #111827;
 }
 
 .about-team-role {
-	margin: 0 0 0.4rem;
+	margin: 0 0 0.45rem;
 	font-size: 0.8rem;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	color: #6b7280;
 }
 
-@media (max-width: 900px) {
-	.about-team {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-}
-@media (max-width: 640px) {
-	.about-team {
-		grid-template-columns: 1fr;
-	}
-}
-
 /* Footer note */
 
 .about-footer-note {
-	font-size: 0.85rem;
+	font-size: 0.86rem;
 	color: #6b7280;
 	text-align: center;
 }
 
+/* Responsive */
+
+@media (max-width: 1024px) {
+	.about-hero {
+		flex-direction: column;
+		padding: 2.4rem 2rem;
+	}
+
+	.about-hero-card {
+		margin-left: 0;
+		max-width: 100%;
+	}
+
+	.about-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.about-team {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 640px) {
+	.about-page {
+		padding: 3.2rem 1.25rem 3.5rem;
+	}
+
+	.about-hero {
+		padding: 2rem 1.6rem;
+	}
+
+	.about-team {
+		grid-template-columns: 1fr;
+	}
+}
+
 /* === CONTACT SECTION ====================================== */
 
 .contact-section {
@@ -1072,7 +1060,7 @@
 
 .contact-section {
 	width: 100%;
-	padding: 4rem 1.5rem 4.5rem;
+	padding: 4rem 2rem 4.5rem;
 	display: flex;
 	justify-content: center;
 	background: #f3f4f6;
@@ -1080,10 +1068,10 @@
 
 .contact-container {
 	width: 100%;
-	max-width: 1100px;
+	max-width: 1400px; /* match home */
 	display: grid;
 	grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-	gap: 2rem;
+	gap: 2.25rem;
 }
 
 /* Left side */
@@ -1091,52 +1079,53 @@
 .contact-info {
 	background: #ffffff;
 	border-radius: 1.5rem;
-	padding: 2rem 2.25rem;
-	box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+	padding: 2.5rem 2.8rem;
+	box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
 }
 
 .contact-title {
 	margin-top: 0;
-	margin-bottom: 0.5rem;
-	font-size: 1.6rem;
+	margin-bottom: 0.7rem;
+	font-size: 1.9rem;
 	color: #0f172a;
 }
 
 .contact-subtitle {
 	margin-top: 0;
-	margin-bottom: 1.5rem;
-	font-size: 0.98rem;
+	margin-bottom: 1.6rem;
+	font-size: 1.02rem;
 	color: #4b5563;
+	line-height: 1.7;
 }
 
 .contact-cards {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
-	gap: 1rem;
+	gap: 1.1rem;
 }
 
 .contact-card {
 	background: #f9fafb;
-	border-radius: 1rem;
-	padding: 1rem 1.1rem;
-	font-size: 0.9rem;
+	border-radius: 1.25rem;
+	padding: 1.15rem 1.3rem;
+	font-size: 0.95rem;
 	color: #374151;
 }
 
 .contact-card h3 {
 	margin-top: 0;
-	margin-bottom: 0.4rem;
-	font-size: 1rem;
+	margin-bottom: 0.5rem;
+	font-size: 1.05rem;
 	color: #111827;
 }
 
 .contact-list {
 	margin: 0.4rem 0 0;
-	padding-left: 1.1rem;
+	padding-left: 1.2rem;
 }
 
 .contact-list li {
-	margin-bottom: 0.15rem;
+	margin-bottom: 0.2rem;
 }
 
 /* Right side: form */
@@ -1145,30 +1134,30 @@
 	background: #020617;
 	color: #e5e7eb;
 	border-radius: 1.5rem;
-	padding: 2rem 2.1rem;
-	box-shadow: 0 16px 40px rgba(15, 23, 42, 0.6);
+	padding: 2.3rem 2.5rem;
+	box-shadow: 0 22px 55px rgba(15, 23, 42, 0.8);
 	display: flex;
 	flex-direction: column;
-	gap: 0.75rem;
+	gap: 0.8rem;
 }
 
 .contact-form-title {
-	margin: 0 0 0.75rem;
-	font-size: 1.1rem;
+	margin: 0 0 0.6rem;
+	font-size: 1.25rem;
 }
 
 .contact-label {
 	display: flex;
 	flex-direction: column;
-	gap: 0.25rem;
+	gap: 0.3rem;
 	font-size: 0.85rem;
 }
 
 .contact-input,
 .contact-textarea {
-	border-radius: 0.75rem;
+	border-radius: 0.85rem;
 	border: 1px solid #4b5563;
-	padding: 0.6rem 0.75rem;
+	padding: 0.65rem 0.8rem;
 	background: #020617;
 	color: #e5e7eb;
 	font-size: 0.9rem;
@@ -1183,17 +1172,17 @@
 .contact-input:focus,
 .contact-textarea:focus {
 	border-color: #3b82f6;
-	box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5);
+	box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.6);
 }
 
 .contact-submit {
-	margin-top: 0.75rem;
+	margin-top: 0.9rem;
 	border: none;
 	border-radius: 999px;
-	padding: 0.7rem 1.4rem;
+	padding: 0.7rem 1.5rem;
 	background: #2563eb;
 	color: #f9fafb;
-	font-size: 0.95rem;
+	font-size: 0.96rem;
 	font-weight: 500;
 	cursor: pointer;
 }
@@ -1203,7 +1192,7 @@
 }
 
 .contact-note {
-	margin: 0.6rem 0 0;
+	margin: 0.7rem 0 0;
 	font-size: 0.8rem;
 	color: #9ca3af;
 }
@@ -1219,20 +1208,29 @@
 		max-width: 480px;
 		width: 100%;
 		margin: 0 auto;
+	}
+}
+
+@media (max-width: 640px) {
+	.contact-section {
+		padding: 3.2rem 1.25rem 3.5rem;
+	}
+
+	.contact-info {
+		padding: 2rem 1.7rem;
+	}
+
+	.contact-form {
+		padding: 2rem 1.7rem;
 	}
 }
 
 /* === SIGN-IN PAGE ========================================= */
 
 .signin-page {
-	min-height: calc(100vh - 56px); /* account for navbar height */
-	padding: 4rem 1.5rem 4.5rem;
-	background: radial-gradient(
-		circle at top,
-		#f3f6ff 0,
-		#f6f7fb 40%,
-		#f8fafc 100%
-	);
+	min-height: calc(100vh - 56px);
+	padding: 4rem 2rem 4.5rem;
+	background: #f3f4f6;
 	display: flex;
 	justify-content: center;
 	box-sizing: border-box;
@@ -1240,7 +1238,7 @@
 
 .signin-container {
 	width: 100%;
-	max-width: 1100px;
+	max-width: 1400px; /* match home */
 	display: grid;
 	grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
 	gap: 2.25rem;
@@ -1251,19 +1249,19 @@
 .signin-info {
 	background: #ffffff;
 	border-radius: 1.5rem;
-	padding: 2.25rem 2.5rem;
-	box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+	padding: 2.5rem 2.8rem;
+	box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
 }
 
 .signin-title {
-	margin: 0 0 0.75rem;
-	font-size: 1.8rem;
+	margin: 0 0 0.8rem;
+	font-size: 1.9rem;
 	color: #0f172a;
 }
 
 .signin-subtitle {
-	margin: 0 0 1.5rem;
-	font-size: 0.98rem;
+	margin: 0 0 1.6rem;
+	font-size: 1.02rem;
 	color: #4b5563;
 	line-height: 1.7;
 }
@@ -1271,7 +1269,7 @@
 .signin-list {
 	margin: 0 0 1.5rem;
 	padding-left: 1.2rem;
-	font-size: 0.92rem;
+	font-size: 0.95rem;
 	color: #374151;
 }
 
@@ -1283,7 +1281,7 @@
 	border-radius: 999px;
 	border: 1px solid #d1d5db;
 	background: #f9fafb;
-	padding: 0.6rem 1.3rem;
+	padding: 0.6rem 1.35rem;
 	font-size: 0.9rem;
 	color: #111827;
 	cursor: pointer;
@@ -1301,14 +1299,14 @@
 	background: #020617;
 	color: #e5e7eb;
 	border-radius: 1.5rem;
-	padding: 2.1rem 2.3rem;
-	box-shadow: 0 22px 55px rgba(15, 23, 42, 0.75);
+	padding: 2.3rem 2.5rem;
+	box-shadow: 0 22px 55px rgba(15, 23, 42, 0.85);
 	display: flex;
 	flex-direction: column;
 }
 
 .signin-card-title {
-	margin: 0 0 0.4rem;
+	margin: 0 0 0.5rem;
 	font-size: 1.25rem;
 }
 
@@ -1321,20 +1319,20 @@
 .signin-form {
 	display: flex;
 	flex-direction: column;
-	gap: 0.75rem;
+	gap: 0.8rem;
 }
 
 .signin-label {
 	display: flex;
 	flex-direction: column;
 	gap: 0.3rem;
-	font-size: 0.83rem;
+	font-size: 0.85rem;
 }
 
 .signin-input {
-	border-radius: 0.75rem;
+	border-radius: 0.85rem;
 	border: 1px solid #4b5563;
-	padding: 0.6rem 0.75rem;
+	padding: 0.65rem 0.8rem;
 	background: #020617;
 	color: #e5e7eb;
 	font-size: 0.9rem;
@@ -1384,13 +1382,13 @@
 }
 
 .signin-submit {
-	margin-top: 0.9rem;
+	margin-top: 0.95rem;
 	border: none;
 	border-radius: 999px;
-	padding: 0.7rem 1.4rem;
+	padding: 0.75rem 1.6rem;
 	background: #2563eb;
 	color: #f9fafb;
-	font-size: 0.95rem;
+	font-size: 0.96rem;
 	font-weight: 500;
 	cursor: pointer;
 }
@@ -1400,8 +1398,8 @@
 }
 
 .signin-disclaimer {
-	margin: 0.6rem 0 0;
-	font-size: 0.78rem;
+	margin: 0.7rem 0 0;
+	font-size: 0.8rem;
 	color: #9ca3af;
 }
 
@@ -1420,11 +1418,15 @@
 }
 
 @media (max-width: 640px) {
+	.signin-page {
+		padding: 3.2rem 1.25rem 3.5rem;
+	}
+
 	.signin-info {
-		padding: 1.75rem 1.6rem;
+		padding: 2rem 1.7rem;
 	}
 
 	.signin-card {
-		padding: 1.8rem 1.6rem;
+		padding: 2rem 1.7rem;
 	}
 }
