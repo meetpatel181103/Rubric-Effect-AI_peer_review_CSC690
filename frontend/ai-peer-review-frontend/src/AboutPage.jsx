@@ -1,4 +1,5 @@
 // src/AboutPage.jsx
+
 function AboutPage() {
 	return (
 		<main className='about-page'>
@@ -85,7 +86,7 @@ function AboutPage() {
 						</div>
 						<div className='about-step'>
 							<span className='about-step-number'>3</span>
-							<h4>AI scoring & feedback</h4>
+							<h4>AI scoring &amp; feedback</h4>
 							<p>
 								The backend sends the essay and rubric to an AI model, which
 								returns scores, comments, rewrites, and citation flags.

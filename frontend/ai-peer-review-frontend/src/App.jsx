@@ -4,6 +4,7 @@ import './App.css';
 import EssayUploadSection from './EssayUploadSection.jsx';
 import AboutPage from './AboutPage';
 import ContactSection from './ContactSection';
+import SignInPage from './SignInPage';
 
 // --- Rubrics data ---
 const RUBRICS = [
@@ -162,7 +163,7 @@ function RubricModal({ rubric, onClose }) {
 
 // --- Single App component with "pages" ---
 function App() {
-	const [activePage, setActivePage] = useState('home'); // 'home' | 'about' | 'contact'
+	const [activePage, setActivePage] = useState('home'); // 'home' | 'about' | 'contact' | 'signin'
 	const [activeRubric, setActiveRubric] = useState(null);
 	const [selectedRubric, setSelectedRubric] = useState(null);
 	const rubricsRef = useRef(null);
@@ -201,7 +202,15 @@ function App() {
 						</button>
 					</nav>
 
-					<button className='nav-signin'>Sign in</button>
+					<button
+						className={`nav-signin ${
+							activePage === 'signin' ? 'nav-signin-active' : ''
+						}`}
+						type='button'
+						onClick={() => setActivePage('signin')}
+					>
+						Sign in
+					</button>
 				</div>
 			</header>
 
@@ -285,6 +294,11 @@ function App() {
 
 			{/* CONTACT PAGE */}
 			{activePage === 'contact' && <ContactSection />}
+
+			{/* SIGN IN PAGE */}
+			{activePage === 'signin' && (
+				<SignInPage onContinue={() => setActivePage('home')} />
+			)}
 
 			{/* Rubric details modal */}
 			<RubricModal
