@@ -1,13 +1,13 @@
 // import { useRef, useState } from 'react'
 
-// function EssayUploadSection() {
+// function EssayUploadSection({ selectedRubric }) {
 //   const [essayText, setEssayText] = useState('')
 //   const [isSubmitting, setIsSubmitting] = useState(false)
 //   const [showResults, setShowResults] = useState(false)
 //   const [uploadedFileName, setUploadedFileName] = useState('')
+//   const [errorMessage, setErrorMessage] = useState('')
 //   const fileInputRef = useRef(null)
 //   const resultsRef = useRef(null)
-
 
 //   const handleUploadClick = () => {
 //     if (fileInputRef.current) {
@@ -20,35 +20,46 @@
 //     if (!file) return
 
 //     setUploadedFileName(file.name)
-
-//     // For now we just show the file name.
-//     // Later you can parse the file and put its text into essayText.
-//     //setEssayText(`Uploaded file: ${file.name}`)
-//     setEssayText(``)
+//     // For now we just show the file name in the textarea as a placeholder.
+//     // Later you can replace this with extracted text.
+//     setEssayText(`Uploaded file: ${file.name}`)
+//     setErrorMessage('') // clear error if any
 //   }
 
 //   const handleGoClick = () => {
 //     if (isSubmitting) return
 
+//     // --- Validation checks ---
+//     if (!selectedRubric) {
+//       setErrorMessage('Please choose a rubric before starting.')
+//       return
+//     }
+
+//     if (!essayText.trim() && !uploadedFileName) {
+//       setErrorMessage('Please paste your essay or upload a file before starting.')
+//       return
+//     }
+
+//     // All good: clear errors, start "submission"
+//     setErrorMessage('')
 //     setIsSubmitting(true)
+//     setShowResults(false)
 
-//     // TODO: replace with real API call.
-//     // When the backend responds, setIsSubmitting(false) and setShowResults(true)
+//     // TODO: replace timeout with real API call
 //     setTimeout(() => {
-//         setIsSubmitting(false)
-//         setShowResults(true)
+//       setIsSubmitting(false)
+//       setShowResults(true)
 
-//         // Wait a moment for React to render the results section
-//         setTimeout(() => {
-//             if (resultsRef.current) {
-//             resultsRef.current.scrollIntoView({
-//                 behavior: 'smooth',
-//                 block: 'start',
-//             })
+//       // Smooth scroll to results
+//       setTimeout(() => {
+//         if (resultsRef.current) {
+//           resultsRef.current.scrollIntoView({
+//             behavior: 'smooth',
+//             block: 'start',
+//           })
 //         }
-//         }, 150) // small delay ensures DOM is ready
+//       }, 150)
 //     }, 1500)
-
 //   }
 
 //   return (
@@ -62,7 +73,12 @@
 //               className="essay-textarea"
 //               placeholder="Paste your essay text here..."
 //               value={essayText}
-//               onChange={(e) => setEssayText(e.target.value)}
+//               onChange={(e) => {
+//                 setEssayText(e.target.value)
+//                 if (e.target.value.trim()) {
+//                   setErrorMessage('')
+//                 }
+//               }}
 //             />
 
 //             <button
@@ -73,7 +89,7 @@
 //               Upload your essay
 //             </button>
 
-//             {/* 👇 NEW: show selected file name */}
+//             {/* Show selected file name */}
 //             {uploadedFileName && (
 //               <div className="upload-file-info">
 //                 <span className="upload-file-label">Selected file:</span>
@@ -91,7 +107,7 @@
 //             />
 //           </div>
 
-//           {/* RIGHT SIDE: GO button with blue ring */}
+//           {/* RIGHT SIDE: GO button with blue ring + error message */}
 //           <div className="upload-right">
 //             <button
 //               type="button"
@@ -108,6 +124,10 @@
 //                 </span>
 //               </span>
 //             </button>
+
+//             {errorMessage && (
+//               <p className="upload-error-message">{errorMessage}</p>
+//             )}
 //           </div>
 //         </div>
 //       </section>
@@ -117,8 +137,9 @@
 //         <section ref={resultsRef} className="results-section">
 //           <div className="results-card">
 //             <p className="results-heading">
-//               Great start! You&apos;ve got a solid foundation. With a few focused
-//               revisions, this essay can become even clearer and more convincing.
+//               Great start! You&apos;ve got a solid foundation. With a few
+//               focused revisions, this essay can become even clearer and more
+//               convincing.
 //             </p>
 
 //             <h3 className="results-rubric-title">
@@ -215,12 +236,26 @@
 
 import { useRef, useState } from 'react'
 
+function getMotivationalMessage(result) {
+  if (!result) return ''
+
+  const ratio = result.overall_score / result.max_score
+
+  if (ratio >= 0.75) {
+    return "Great work! Your essay is already strong—these tweaks will help you polish it even further."
+  } else if (ratio >= 0.5) {
+    return "Great start! You’ve got a solid foundation. With a few focused revisions, this essay can become even clearer and more convincing."
+  } else {
+    return "You’ve taken an important first step by getting your ideas down. With some structured revisions, you can turn this into a much stronger essay."
+  }
+}
+
 function EssayUploadSection({ selectedRubric }) {
   const [essayText, setEssayText] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showResults, setShowResults] = useState(false)
   const [uploadedFileName, setUploadedFileName] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [reviewResult, setReviewResult] = useState(null)
   const fileInputRef = useRef(null)
   const resultsRef = useRef(null)
 
@@ -236,15 +271,15 @@ function EssayUploadSection({ selectedRubric }) {
 
     setUploadedFileName(file.name)
     // For now we just show the file name in the textarea as a placeholder.
-    // Later you can replace this with extracted text.
+    // Later you'll replace this with extracted text from the file.
     setEssayText(`Uploaded file: ${file.name}`)
-    setErrorMessage('') // clear error if any
+    setErrorMessage('')
   }
 
-  const handleGoClick = () => {
+  const handleGoClick = async () => {
     if (isSubmitting) return
 
-    // --- Validation checks ---
+    // --- Validation ---
     if (!selectedRubric) {
       setErrorMessage('Please choose a rubric before starting.')
       return
@@ -255,15 +290,32 @@ function EssayUploadSection({ selectedRubric }) {
       return
     }
 
-    // All good: clear errors, start "submission"
     setErrorMessage('')
     setIsSubmitting(true)
-    setShowResults(false)
+    setReviewResult(null)
 
-    // TODO: replace timeout with real API call
-    setTimeout(() => {
-      setIsSubmitting(false)
-      setShowResults(true)
+    try {
+      const payload = {
+        rubric_id: selectedRubric.id ?? selectedRubric.rubric_id ?? 'argumentative_essay_v1',
+        // For now send whatever is in essayText.
+        // Later, if only a file is uploaded, you can send the extracted text instead.
+        essay_text: essayText || `Uploaded file: ${uploadedFileName}`,
+      }
+
+      const response = await fetch('http://localhost:8000/review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`)
+      }
+
+      const data = await response.json()
+      setReviewResult(data)
 
       // Smooth scroll to results
       setTimeout(() => {
@@ -274,7 +326,12 @@ function EssayUploadSection({ selectedRubric }) {
           })
         }
       }, 150)
-    }, 1500)
+    } catch (err) {
+      console.error(err)
+      setErrorMessage('Something went wrong while running the review. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -304,7 +361,7 @@ function EssayUploadSection({ selectedRubric }) {
               Upload your essay
             </button>
 
-            {/* Show selected file name */}
+            {/* Selected file name */}
             {uploadedFileName && (
               <div className="upload-file-info">
                 <span className="upload-file-label">Selected file:</span>
@@ -322,7 +379,7 @@ function EssayUploadSection({ selectedRubric }) {
             />
           </div>
 
-          {/* RIGHT SIDE: GO button with blue ring + error message */}
+          {/* RIGHT SIDE: GO button + error */}
           <div className="upload-right">
             <button
               type="button"
@@ -347,21 +404,24 @@ function EssayUploadSection({ selectedRubric }) {
         </div>
       </section>
 
-      {/* Results section (hidden until GO pressed) */}
-      {showResults && (
+      {/* Results section – visible only when reviewResult is set */}
+      {reviewResult && (
         <section ref={resultsRef} className="results-section">
           <div className="results-card">
             <p className="results-heading">
-              Great start! You&apos;ve got a solid foundation. With a few
-              focused revisions, this essay can become even clearer and more
-              convincing.
+              {getMotivationalMessage(reviewResult)}
             </p>
 
             <h3 className="results-rubric-title">
-              Argumentative Essay Rubric
+              {selectedRubric?.name ?? 'Argumentative Essay Rubric'}
             </h3>
 
+            <p style={{ textAlign: 'center', marginBottom: '1rem', color: '#4b5563' }}>
+              Overall score: <strong>{reviewResult.overall_score}</strong> / {reviewResult.max_score}
+            </p>
+
             <div className="results-table-wrapper">
+              {/* Table identical to rubric modal structure */}
               <table className="rubric-table results-table">
                 <thead>
                   <tr>
@@ -428,16 +488,12 @@ function EssayUploadSection({ selectedRubric }) {
               </table>
             </div>
 
+            {/* Use backend comments in a friendlier paragraph */}
             <p className="results-advice">
-              <strong>How to keep improving:</strong> Start by sharpening your
-              thesis into a specific, arguable claim that clearly expresses your
-              position. Then, review each paragraph and make sure it directly
-              supports that thesis with concrete evidence—quotations, data, or
-              clearly described examples. Add a short explanation after each
-              piece of evidence so your reader understands exactly how it proves
-              your point. Finally, use transitions at the beginnings and ends of
-              paragraphs to connect your ideas and create a smoother, more
-              confident flow from start to finish.
+              <strong>How to keep improving:</strong>{' '}
+              {reviewResult.criteria
+                .map((c) => c.comment)
+                .join(' ')}
             </p>
           </div>
         </section>
