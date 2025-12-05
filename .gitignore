@@ -1,20 +1,58 @@
-# Dependencies
-node_modules/
-
 # Build outputs
-dist/
-build/
 .vite/
 
-# Logs and environment files
-*.log
+# --- Python / FastAPI backend ---
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environment files
 .env
-.env.local
+.env.*
 
-# System files
-.DS_Store
-Thumbs.db
+# Logs
+*.log
 
-# IDE settings
+# Database files (if using SQLite in dev)
+*.db
+*.sqlite3
+
+# Migrations cache
+alembic/versions/__pycache__/
+
+# IDE / Editor settings
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# --- Node / React frontend ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+.cache/
+*.lock
+
+# Local environment files
+frontend/.env
+backend/.env
+
+# --- OS specific ---
+.DS_Store
+Thumbs.db
