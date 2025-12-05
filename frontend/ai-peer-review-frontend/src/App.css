@@ -473,9 +473,19 @@
 .upload-right {
 	flex: 1;
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	gap: 0.5rem;
 }
+
+.upload-error-message {
+  font-size: 0.9rem;
+  color: #b91c1c; /* red-700 */
+  text-align: center;
+  max-width: 220px;
+}
+
 
 /* GO button with blue ring */
 
@@ -1429,4 +1439,25 @@
 	.signin-card {
 		padding: 2rem 1.7rem;
 	}
+}
+
+.upload-file-info {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.75rem;
+  background-color: #eef2ff; /* soft theme blue */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+}
+
+.upload-file-label {
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.upload-file-name {
+  color: #111827;
+  font-weight: 500;
 }
