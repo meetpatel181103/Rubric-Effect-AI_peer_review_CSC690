@@ -52,6 +52,7 @@ build/
 # Local environment files
 frontend/.env
 backend/.env
+backend/venv/
 
 # --- OS specific ---
 .DS_Store
