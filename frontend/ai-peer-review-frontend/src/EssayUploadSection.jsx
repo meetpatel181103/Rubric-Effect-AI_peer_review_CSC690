@@ -1,11 +1,25 @@
 // import { useRef, useState } from 'react'
 
+// function getMotivationalMessage(result) {
+//   if (!result) return ''
+
+//   const ratio = result.overall_score / result.max_score
+
+//   if (ratio >= 0.75) {
+//     return "Great work! Your essay is already strong—these tweaks will help you polish it even further."
+//   } else if (ratio >= 0.5) {
+//     return "Great start! You’ve got a solid foundation. With a few focused revisions, this essay can become even clearer and more convincing."
+//   } else {
+//     return "You’ve taken an important first step by getting your ideas down. With some structured revisions, you can turn this into a much stronger essay."
+//   }
+// }
+
 // function EssayUploadSection({ selectedRubric }) {
 //   const [essayText, setEssayText] = useState('')
-//   const [isSubmitting, setIsSubmitting] = useState(false)
-//   const [showResults, setShowResults] = useState(false)
 //   const [uploadedFileName, setUploadedFileName] = useState('')
+//   const [isSubmitting, setIsSubmitting] = useState(false)
 //   const [errorMessage, setErrorMessage] = useState('')
+//   const [reviewResult, setReviewResult] = useState(null)
 //   const fileInputRef = useRef(null)
 //   const resultsRef = useRef(null)
 
@@ -21,15 +35,15 @@
 
 //     setUploadedFileName(file.name)
 //     // For now we just show the file name in the textarea as a placeholder.
-//     // Later you can replace this with extracted text.
+//     // Later you'll replace this with extracted text from the file.
 //     setEssayText(`Uploaded file: ${file.name}`)
-//     setErrorMessage('') // clear error if any
+//     setErrorMessage('')
 //   }
 
-//   const handleGoClick = () => {
+//   const handleGoClick = async () => {
 //     if (isSubmitting) return
 
-//     // --- Validation checks ---
+//     // --- Validation ---
 //     if (!selectedRubric) {
 //       setErrorMessage('Please choose a rubric before starting.')
 //       return
@@ -40,15 +54,32 @@
 //       return
 //     }
 
-//     // All good: clear errors, start "submission"
 //     setErrorMessage('')
 //     setIsSubmitting(true)
-//     setShowResults(false)
+//     setReviewResult(null)
 
-//     // TODO: replace timeout with real API call
-//     setTimeout(() => {
-//       setIsSubmitting(false)
-//       setShowResults(true)
+//     try {
+//       const payload = {
+//         rubric_id: selectedRubric.id ?? selectedRubric.rubric_id ?? 'argumentative_essay_v1',
+//         // For now send whatever is in essayText.
+//         // Later, if only a file is uploaded, you can send the extracted text instead.
+//         essay_text: essayText || `Uploaded file: ${uploadedFileName}`,
+//       }
+
+//       const response = await fetch('http://localhost:8000/review', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(payload),
+//       })
+
+//       if (!response.ok) {
+//         throw new Error(`Request failed with status ${response.status}`)
+//       }
+
+//       const data = await response.json()
+//       setReviewResult(data)
 
 //       // Smooth scroll to results
 //       setTimeout(() => {
@@ -59,7 +90,12 @@
 //           })
 //         }
 //       }, 150)
-//     }, 1500)
+//     } catch (err) {
+//       console.error(err)
+//       setErrorMessage('Something went wrong while running the review. Please try again.')
+//     } finally {
+//       setIsSubmitting(false)
+//     }
 //   }
 
 //   return (
@@ -89,7 +125,7 @@
 //               Upload your essay
 //             </button>
 
-//             {/* Show selected file name */}
+//             {/* Selected file name */}
 //             {uploadedFileName && (
 //               <div className="upload-file-info">
 //                 <span className="upload-file-label">Selected file:</span>
@@ -107,7 +143,7 @@
 //             />
 //           </div>
 
-//           {/* RIGHT SIDE: GO button with blue ring + error message */}
+//           {/* RIGHT SIDE: GO button + error */}
 //           <div className="upload-right">
 //             <button
 //               type="button"
@@ -132,21 +168,24 @@
 //         </div>
 //       </section>
 
-//       {/* Results section (hidden until GO pressed) */}
-//       {showResults && (
+//       {/* Results section – visible only when reviewResult is set */}
+//       {reviewResult && (
 //         <section ref={resultsRef} className="results-section">
 //           <div className="results-card">
 //             <p className="results-heading">
-//               Great start! You&apos;ve got a solid foundation. With a few
-//               focused revisions, this essay can become even clearer and more
-//               convincing.
+//               {getMotivationalMessage(reviewResult)}
 //             </p>
 
 //             <h3 className="results-rubric-title">
-//               Argumentative Essay Rubric
+//               {selectedRubric?.name ?? 'Argumentative Essay Rubric'}
 //             </h3>
 
+//             <p style={{ textAlign: 'center', marginBottom: '1rem', color: '#4b5563' }}>
+//               Overall score: <strong>{reviewResult.overall_score}</strong> / {reviewResult.max_score}
+//             </p>
+
 //             <div className="results-table-wrapper">
+//               {/* Table identical to rubric modal structure */}
 //               <table className="rubric-table results-table">
 //                 <thead>
 //                   <tr>
@@ -213,16 +252,12 @@
 //               </table>
 //             </div>
 
+//             {/* Use backend comments in a friendlier paragraph */}
 //             <p className="results-advice">
-//               <strong>How to keep improving:</strong> Start by sharpening your
-//               thesis into a specific, arguable claim that clearly expresses your
-//               position. Then, review each paragraph and make sure it directly
-//               supports that thesis with concrete evidence—quotations, data, or
-//               clearly described examples. Add a short explanation after each
-//               piece of evidence so your reader understands exactly how it proves
-//               your point. Finally, use transitions at the beginnings and ends of
-//               paragraphs to connect your ideas and create a smoother, more
-//               confident flow from start to finish.
+//               <strong>How to keep improving:</strong>{' '}
+//               {reviewResult.criteria
+//                 .map((c) => c.comment)
+//                 .join(' ')}
 //             </p>
 //           </div>
 //         </section>
@@ -233,7 +268,6 @@
 
 // export default EssayUploadSection
 
-
 import { useRef, useState } from 'react'
 
 function getMotivationalMessage(result) {
@@ -242,13 +276,41 @@ function getMotivationalMessage(result) {
   const ratio = result.overall_score / result.max_score
 
   if (ratio >= 0.75) {
-    return "Great work! Your essay is already strong—these tweaks will help you polish it even further."
+    return 'Great work! Your essay is already strong—these tweaks will help you polish it even further.'
   } else if (ratio >= 0.5) {
-    return "Great start! You’ve got a solid foundation. With a few focused revisions, this essay can become even clearer and more convincing."
+    return 'Great start! You’ve got a solid foundation. With a few focused revisions, this essay can become even clearer and more convincing.'
   } else {
-    return "You’ve taken an important first step by getting your ideas down. With some structured revisions, you can turn this into a much stronger essay."
+    return 'You’ve taken an important first step by getting your ideas down. With some structured revisions, you can turn this into a much stronger essay.'
   }
 }
+
+// function getOverallImpression(result) {
+//   if (!result) return ''
+
+//   const ratio = result.overall_score / result.max_score
+//   if (ratio >= 0.75) {
+//     return 'Overall, this is a well-developed essay with a clear sense of purpose. Your ideas come across confidently, and there is already a strong foundation for a persuasive argument.'
+//   } else if (ratio >= 0.5) {
+//     return 'Overall, your essay shows genuine effort and a developing argument. There are clear ideas and moments of insight, even if the structure and support are not fully consistent yet.'
+//   } else {
+//     return 'Overall, your essay captures some important ideas, but they are not yet fully organized or supported. Treat this draft as a starting point that you can now shape into a clearer and more persuasive argument.'
+//   }
+// }
+
+// function getImprovementSummary(result) {
+//   if (!result) return ''
+
+//   const comments = result.criteria.map((c) => c.comment).join(' ')
+//   return `Here are the main areas to strengthen: ${comments}`
+// }
+
+// function getExampleNextSteps() {
+//   return (
+//     'For your next revision, you might start by rewriting the thesis as one clear, specific sentence that states your position and hints at your main reasons. ' +
+//     'Then, choose two or three key body paragraphs and add a concrete example, quote, or piece of data to each, followed by a short explanation of how that evidence supports your point. ' +
+//     'Finally, add or refine topic sentences and closing sentences so each paragraph clearly connects back to the thesis and helps the reader follow your argument from beginning to end.'
+//   )
+// }
 
 function EssayUploadSection({ selectedRubric }) {
   const [essayText, setEssayText] = useState('')
@@ -271,7 +333,6 @@ function EssayUploadSection({ selectedRubric }) {
 
     setUploadedFileName(file.name)
     // For now we just show the file name in the textarea as a placeholder.
-    // Later you'll replace this with extracted text from the file.
     setEssayText(`Uploaded file: ${file.name}`)
     setErrorMessage('')
   }
@@ -297,8 +358,6 @@ function EssayUploadSection({ selectedRubric }) {
     try {
       const payload = {
         rubric_id: selectedRubric.id ?? selectedRubric.rubric_id ?? 'argumentative_essay_v1',
-        // For now send whatever is in essayText.
-        // Later, if only a file is uploaded, you can send the extracted text instead.
         essay_text: essayText || `Uploaded file: ${uploadedFileName}`,
       }
 
@@ -333,6 +392,18 @@ function EssayUploadSection({ selectedRubric }) {
       setIsSubmitting(false)
     }
   }
+
+  // Build a quick lookup for scores by criterion id
+  const criterionScores = {}
+  if (reviewResult?.criteria) {
+    reviewResult.criteria.forEach((c) => {
+      criterionScores[c.id] = c.score
+    })
+  }
+
+  const thesisScore = criterionScores['thesis_clarity']
+  const evidenceScore = criterionScores['evidence_support']
+  const organizationScore = criterionScores['organization_flow']
 
   return (
     <>
@@ -416,70 +487,140 @@ function EssayUploadSection({ selectedRubric }) {
               {selectedRubric?.name ?? 'Argumentative Essay Rubric'}
             </h3>
 
-            <p style={{ textAlign: 'center', marginBottom: '1rem', color: '#4b5563' }}>
-              Overall score: <strong>{reviewResult.overall_score}</strong> / {reviewResult.max_score}
+            <p
+              style={{
+                textAlign: 'center',
+                marginBottom: '1rem',
+                color: '#4b5563',
+              }}
+            >
+              Overall score: <strong>{reviewResult.overall_score}</strong> /{' '}
+              {reviewResult.max_score}
             </p>
 
             <div className="results-table-wrapper">
-              {/* Table identical to rubric modal structure */}
               <table className="rubric-table results-table">
                 <thead>
                   <tr>
                     <th>Criterion</th>
                     <th>Excellent (4)</th>
                     <th>Proficient (3)</th>
-                    <th className="rubric-level-highlight">Developing (2)</th>
+                    <th>Developing (2)</th>
                     <th>Beginning (1–0)</th>
                   </tr>
                 </thead>
                 <tbody>
+                  {/* Thesis Clarity row */}
                   <tr>
                     <td className="rubric-criterion-cell">Thesis Clarity</td>
-                    <td>
+                    <td
+                      className={
+                        thesisScore === 4 ? 'rubric-score-highlight' : ''
+                      }
+                    >
                       4 – Clear, focused thesis stated early and maintained
                       throughout.
                     </td>
-                    <td>
+                    <td
+                      className={
+                        thesisScore === 3 ? 'rubric-score-highlight' : ''
+                      }
+                    >
                       3 – Thesis is understandable but could be more specific.
                     </td>
-                    <td className="rubric-level-highlight">
+                    <td
+                      className={
+                        thesisScore === 2 ? 'rubric-score-highlight' : ''
+                      }
+                    >
                       2 – Thesis is vague, overly broad, or general.
                     </td>
-                    <td>1–0 – No clear thesis identifiable.</td>
+                    <td
+                      className={
+                        thesisScore !== undefined && thesisScore <= 1
+                          ? 'rubric-score-highlight'
+                          : ''
+                      }
+                    >
+                      1–0 – No clear thesis identifiable.
+                    </td>
                   </tr>
+
+                  {/* Evidence & Support row */}
                   <tr>
                     <td className="rubric-criterion-cell">
                       Evidence &amp; Support
                     </td>
-                    <td>
+                    <td
+                      className={
+                        evidenceScore === 4 ? 'rubric-score-highlight' : ''
+                      }
+                    >
                       4 – Strong, relevant evidence with credible sources and
                       clear explanations.
                     </td>
-                    <td>
+                    <td
+                      className={
+                        evidenceScore === 3 ? 'rubric-score-highlight' : ''
+                      }
+                    >
                       3 – Adequate evidence with some explanation and mostly
                       relevant sources.
                     </td>
-                    <td className="rubric-level-highlight">
+                    <td
+                      className={
+                        evidenceScore === 2 ? 'rubric-score-highlight' : ''
+                      }
+                    >
                       2 – Limited or partially relevant evidence; links to
                       claims are unclear.
                     </td>
-                    <td>1–0 – Claims are unsupported or based mostly on opinion.</td>
+                    <td
+                      className={
+                        evidenceScore !== undefined && evidenceScore <= 1
+                          ? 'rubric-score-highlight'
+                          : ''
+                      }
+                    >
+                      1–0 – Claims are unsupported or based mostly on opinion.
+                    </td>
                   </tr>
+
+                  {/* Organization & Flow row */}
                   <tr>
                     <td className="rubric-criterion-cell">
                       Organization &amp; Flow
                     </td>
-                    <td>
+                    <td
+                      className={
+                        organizationScore === 4 ? 'rubric-score-highlight' : ''
+                      }
+                    >
                       4 – Ideas flow logically with smooth transitions between
                       paragraphs.
                     </td>
-                    <td>
+                    <td
+                      className={
+                        organizationScore === 3 ? 'rubric-score-highlight' : ''
+                      }
+                    >
                       3 – Mostly logical structure; a few rough transitions.
                     </td>
-                    <td className="rubric-level-highlight">
+                    <td
+                      className={
+                        organizationScore === 2 ? 'rubric-score-highlight' : ''
+                      }
+                    >
                       2 – Some disorganized sections; ideas may feel jumpy.
                     </td>
-                    <td>
+                    <td
+                      className={
+                        organizationScore !== undefined &&
+                        organizationScore <= 1
+                          ? 'rubric-score-highlight'
+                          : ''
+                      }
+                    >
                       1–0 – Lacks clear structure; difficult for the reader to
                       follow.
                     </td>
@@ -488,13 +629,19 @@ function EssayUploadSection({ selectedRubric }) {
               </table>
             </div>
 
-            {/* Use backend comments in a friendlier paragraph */}
-            <p className="results-advice">
-              <strong>How to keep improving:</strong>{' '}
-              {reviewResult.criteria
-                .map((c) => c.comment)
-                .join(' ')}
-            </p>
+            {/* Three-paragraph feedback block */}
+            <div className="results-advice-block">
+              <p className="results-advice">
+                <strong>Overall impression:</strong> {reviewResult.overall_impression}
+              </p>
+              <p className="results-advice">
+                <strong>Key areas to strengthen:</strong> {reviewResult.improvement_summary}
+              </p>
+              <p className="results-advice">
+                <strong>Example next steps:</strong> {reviewResult.next_steps_example}
+              </p>
+            </div>
+
           </div>
         </section>
       )}
