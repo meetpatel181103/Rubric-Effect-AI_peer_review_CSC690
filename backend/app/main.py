@@ -1,17 +1,15 @@
-import os
-from dotenv import load_dotenv
-
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from starlette import status
 
 from .schemas import ReviewRequest, ReviewResponse, CriterionResult
-from .rubrics import get_rubric_by_id, ARGUMENTATIVE_RUBRIC
-from .llm_client import score_essay_with_rubric
+from .rubrics import get_rubric_by_id
+from .llm_client import score_essay_with_rubric  # UPDATED
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # from .dummy_data import make_dummy_review
-
-load_dotenv()  # This will read backend/.env when the app starts
-
 
 
 app = FastAPI(
@@ -49,12 +47,14 @@ MAX_WORDS = 1500
 
 @app.post("/review", response_model=ReviewResponse)
 async def review_essay(payload: ReviewRequest):
+    
     """
     Use the LLM to score an essay against a rubric and return structured feedback.
     """
 
     # --- 1) Validate rubric id ---
     rubric = get_rubric_by_id(payload.rubric_id)
+    print("DEBUG rubric_id received:", payload.rubric_id)
     if rubric is None:
         # For now, we only support one rubric.
         raise HTTPException(

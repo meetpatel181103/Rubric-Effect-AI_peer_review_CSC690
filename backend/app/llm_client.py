@@ -1,35 +1,42 @@
-# backend/app/llm_client.py
+# backend/app/llm_client.py  (adjust path as needed)
+
 import os
 import json
-from openai import OpenAI
+from pathlib import Path
+
+from google import genai
+from dotenv import load_dotenv
+
 from .rubrics import ARGUMENTATIVE_RUBRIC
 
 
-def _get_client() -> OpenAI:
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError(
-            "OPENAI_API_KEY is not set. Make sure it is defined in your .env file."
-        )
-    return OpenAI(api_key=api_key)
+# --- Load environment variables explicitly (in case main.py wasn't enough) ---
+# Try to locate a .env file relative to this file if not already loaded.
+if not os.getenv("GEMINI_API_KEY"):
+    # Look for ../.env relative to this file (i.e., backend/.env)
+    env_path = Path(__file__).resolve().parents[1] / ".env"
+    load_dotenv(dotenv_path=env_path)
 
+
+# --- Create a single global client and model id ---
+API_KEY = os.getenv("GEMINI_API_KEY")
+if not API_KEY:
+    # Fail fast at import time so we see a clear error in logs
+    raise RuntimeError("GEMINI_API_KEY is missing from environment/.env")
+
+MODEL_ID = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+
+client = genai.Client(api_key=API_KEY)
 
 
 def score_essay_with_rubric(essay_text: str, rubric=ARGUMENTATIVE_RUBRIC) -> dict:
     """
-    Calls the LLM to score the essay using the 3-criterion rubric.
-    Returns a dict of form:
-    {
-      "criteria": [ {id, score, comment}, ... ],
-      "overall_impression": "...",
-      "improvement_summary": "...",
-      "next_steps_example": "..."
-    }
+    Calls the Gemini model using the new google-genai client and returns a parsed JSON dict
+    following the expected rubric structure.
     """
-    client = _get_client()  # <-- client created here, not at import time
 
     rubric_description = "\n".join(
-        f"- {c['label']}: {c['description']}"
+        f"- {c['id']} ({c['label']}): {c['description']}"
         for c in rubric["criteria"]
     )
 
@@ -46,51 +53,45 @@ def score_essay_with_rubric(essay_text: str, rubric=ARGUMENTATIVE_RUBRIC) -> dic
 }
 """
 
-    prompt_user = f"""
-Score the following student essay using the provided rubric.
+    prompt = f"""
+You are an essay evaluator.
 
-Essay:
-\"\"\"{essay_text}\"\"\"
+Score the essay using this rubric:
 
-Rubric (3 criteria):
 {rubric_description}
 
-Instructions:
-- Score each criterion from 0 to 4.
-- Write 1–2 sentences explaining the score in "comment".
-- Write a brief "overall_impression" describing the essay quality.
-- Write "improvement_summary" listing what needs to improve.
-- Write "next_steps_example" giving actionable revision advice.
-- Return ONLY valid JSON matching this schema:
+Essay text:
+\"\"\"{essay_text}\"\"\"
+
+INSTRUCTIONS:
+- Output ONLY valid JSON.
+- Score each criterion from 0–4.
+- Provide short, helpful comments.
+- Provide 3 additional feedback fields:
+    - overall_impression
+    - improvement_summary
+    - next_steps_example
+
+JSON schema to follow exactly:
 
 {target_schema}
 """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "You are an assistant that scores essays using a rubric. "
-                    "Respond ONLY with valid JSON."
-                ),
-            },
-            {"role": "user", "content": prompt_user},
-        ],
-        max_tokens=600,
-        temperature=0.2,
+    # --- Call Gemini using the new client ---
+    response = client.models.generate_content(
+        model=MODEL_ID,
+        contents=prompt,
     )
 
-    raw = response.choices[0].message.content.strip()
+    raw = (response.text or "").strip()
 
+    # --- Parse JSON, with a small fallback if model wraps in extra text ---
     try:
         return json.loads(raw)
     except Exception:
-        # Fallback to try extracting JSON substring
         try:
             start = raw.find("{")
             end = raw.rfind("}") + 1
             return json.loads(raw[start:end])
         except Exception:
-            raise ValueError("LLM returned invalid JSON:\n" + raw)
+            raise ValueError(f"Gemini returned invalid JSON:\n{raw}")
