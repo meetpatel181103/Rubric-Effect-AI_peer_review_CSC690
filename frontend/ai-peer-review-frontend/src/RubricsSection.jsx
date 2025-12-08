@@ -12,6 +12,7 @@ const RUBRICS = [
       'For persuasive or position papers. Evaluates thesis, evidence, organization, and counterarguments.',
     tableRows: [
       {
+        id: 'thesis_clarity',
         criterion: 'Thesis Clarity',
         excellent:
           '4 – Clear, focused thesis stated early and maintained throughout.',
@@ -20,6 +21,7 @@ const RUBRICS = [
         beginning: '1–0 – No clear thesis identifiable.',
       },
       {
+        id: 'evidence_support',
         criterion: 'Evidence & Support',
         excellent:
           '4 – Strong, relevant evidence with credible sources and clear explanations.',
@@ -30,6 +32,7 @@ const RUBRICS = [
         beginning: '1–0 – Claims are unsupported or based mostly on opinion.',
       },
       {
+        id: 'organization_flow',
         criterion: 'Organization & Flow',
         excellent:
           '4 – Ideas flow logically with smooth transitions between paragraphs.',
@@ -48,6 +51,7 @@ const RUBRICS = [
       'For close reading or analysis tasks. Emphasizes reasoning, insight, and how well evidence is interpreted.',
     tableRows: [
       {
+        id: 'depth_of_analysis',
         criterion: 'Depth of Analysis',
         excellent:
           '4 – Offers insightful, nuanced analysis that goes beyond summary.',
@@ -57,6 +61,7 @@ const RUBRICS = [
         beginning: '1–0 – Minimal or no analysis; largely retells information.',
       },
       {
+        id: 'reasoning_connections',
         criterion: 'Reasoning & Connections',
         excellent:
           '4 – Clear, logical reasoning; strong connections between ideas and claims.',
@@ -66,6 +71,7 @@ const RUBRICS = [
         beginning: '1–0 – Reasoning is unclear or largely missing.',
       },
       {
+        id: 'use_of_evidence',
         criterion: 'Use of Evidence',
         excellent: '4 – Evidence is well-chosen and thoroughly explained.',
         proficient:
@@ -85,6 +91,7 @@ const RUBRICS = [
       'For longer research projects. Evaluates quality of sources, citation practices, and ethical use of information.',
     tableRows: [
       {
+        id: 'source_quality',
         criterion: 'Source Quality',
         excellent:
           '4 – Uses high-quality, credible, and varied academic or professional sources.',
@@ -93,6 +100,7 @@ const RUBRICS = [
         beginning: '1–0 – Relies on low-quality, questionable, or few sources.',
       },
       {
+        id: 'citation_formatting',
         criterion: 'Citation & Formatting',
         excellent:
           '4 – Consistently accurate citation style with very few or no errors.',
@@ -101,7 +109,8 @@ const RUBRICS = [
         beginning: '1–0 – Little or no attempt to cite sources properly.',
       },
       {
-        criterion: 'Academic Integrity',
+         id: 'academic_integrity',
+         criterion: 'Academic Integrity',
         excellent:
           '4 – Sources are clearly attributed; paraphrasing and quoting are ethical and accurate.',
         proficient:

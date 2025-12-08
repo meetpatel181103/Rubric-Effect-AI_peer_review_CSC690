@@ -3,3 +3,6 @@ uvicorn[standard]
 pydantic
 python-dotenv
 google-genai
+pdfplumber
+python-docx
+python-multipart

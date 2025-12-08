@@ -1,7 +1,8 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from starlette import status
 
+from .file_parsers import extract_text_from_file, UnsupportedFileTypeError
 from .schemas import ReviewRequest, ReviewResponse, CriterionResult
 from .rubrics import get_rubric_by_id
 from .llm_client import score_essay_with_rubric  # UPDATED
@@ -148,3 +149,49 @@ async def review_essay(payload: ReviewRequest):
         improvement_summary=llm_result["improvement_summary"],
         next_steps_example=llm_result["next_steps_example"],
     )
+
+
+@app.post("/extract-text")
+async def extract_text(file: UploadFile = File(...)):
+    """
+    Accept a PDF / DOCX / TXT file and return extracted plain text.
+    """
+    filename = file.filename or "uploaded_file"
+
+    try:
+        data = await file.read()
+        if not data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Uploaded file is empty.",
+            )
+
+        text = extract_text_from_file(filename, data)
+
+        if not text.strip():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="We could not extract any text from that file. "
+                       "It may be scanned or image-only.",
+            )
+
+        return {"text": text}
+
+    except UnsupportedFileTypeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+    except HTTPException:
+        # re-raise any HTTPException we explicitly created
+        raise
+
+    except Exception as e:
+        # Unexpected parsing error
+        print("Error while extracting text:", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Something went wrong while reading the file. "
+                   "Please try another file or paste your text instead.",
+        ) from e
