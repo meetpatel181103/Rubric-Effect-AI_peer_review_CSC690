@@ -366,6 +366,7 @@ function EssayUploadSection({ selectedRubric }) {
 
   const fileInputRef = useRef(null)
   const resultsRef = useRef(null)
+  const citationRef = useRef(null);
 
   const handleUploadClick = () => {
     if (fileInputRef.current) {
@@ -493,6 +494,14 @@ function EssayUploadSection({ selectedRubric }) {
       } else {
         const citationData = await citationResponse.json()
         setCitationResult(citationData)
+
+        // small delay ensures element is rendered before scrolling
+        setTimeout(() => {
+          citationRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }, 50);
       }
     }
   } catch (err) {
@@ -715,7 +724,7 @@ function EssayUploadSection({ selectedRubric }) {
           {/* Citation results card – separate block below */}
           {citationResult && (
             <section className="results-section">
-              <div className="results-card citation-results-card">
+              <div ref={citationRef} className="results-card citation-results-card">
                 <h3 className="results-rubric-title">
                   Citation &amp; Academic Integrity
                 </h3>
