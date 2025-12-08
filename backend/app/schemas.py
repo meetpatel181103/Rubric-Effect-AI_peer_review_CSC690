@@ -1,7 +1,7 @@
 # backend/app/schemas.py
 from typing import List
 from pydantic import BaseModel
-
+from typing import Literal
 
 class CriterionResult(BaseModel):
     id: str
@@ -12,8 +12,13 @@ class CriterionResult(BaseModel):
 
 
 class ReviewRequest(BaseModel):
-    rubric_id: str   # e.g. "argumentative_essay_v1"
-    essay_text: str  # full essay text (or placeholder from file)
+    rubric_id: Literal[
+        "argumentative_essay_v1",
+        "analytical_essay_v1",
+        "research_essay_v1",
+    ]
+    essay_text: str
+
 
 
 class ReviewResponse(BaseModel):

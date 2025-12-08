@@ -7,8 +7,6 @@ from pathlib import Path
 from google import genai
 from dotenv import load_dotenv
 
-from .rubrics import ARGUMENTATIVE_RUBRIC
-
 
 # --- Load environment variables explicitly (in case main.py wasn't enough) ---
 # Try to locate a .env file relative to this file if not already loaded.
@@ -29,29 +27,37 @@ MODEL_ID = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 client = genai.Client(api_key=API_KEY)
 
 
-def score_essay_with_rubric(essay_text: str, rubric=ARGUMENTATIVE_RUBRIC) -> dict:
+def score_essay_with_rubric(essay_text: str, rubric) -> dict:
     """
     Calls the Gemini model using the new google-genai client and returns a parsed JSON dict
     following the expected rubric structure.
     """
+
+    if rubric is None:
+        raise ValueError("rubric must not be None")
 
     rubric_description = "\n".join(
         f"- {c['id']} ({c['label']}): {c['description']}"
         for c in rubric["criteria"]
     )
 
-    target_schema = """
-{
-  "criteria": [
-    { "id": "thesis_clarity", "score": 0, "comment": "" },
-    { "id": "evidence_support", "score": 0, "comment": "" },
-    { "id": "organization_flow", "score": 0, "comment": "" }
-  ],
-  "overall_impression": "",
-  "improvement_summary": "",
-  "next_steps_example": ""
-}
-"""
+    criteria_schema_lines = [
+        f'    {{ "id": "{c["id"]}", "score": 0, "comment": "" }}'
+        for c in rubric["criteria"]
+    ]
+    criteria_schema = ",\n".join(criteria_schema_lines)
+
+    target_schema = f"""
+    {{
+    "criteria": [
+    {criteria_schema}
+    ],
+    "overall_impression": "",
+    "improvement_summary": "",
+    "next_steps_example": ""
+    }}
+    """
+
 
     prompt = f"""
 You are an essay evaluator.
