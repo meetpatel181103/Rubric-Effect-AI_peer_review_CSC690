@@ -31,3 +31,21 @@ class ReviewResponse(BaseModel):
     overall_impression: str
     improvement_summary: str
     next_steps_example: str
+
+class CitationIssue(BaseModel):
+    type: Literal["missing_intext", "missing_reference", "formatting", "other", "incomplete_intext", "incomplete_citation"]
+    message: str
+    excerpt: str | None = None
+    suggestion: str | None = None
+
+
+class CitationCheckRequest(BaseModel):
+    essay_text: str
+    citation_style: str | None = None  # e.g. "APA", "MLA", or None/unknown
+
+
+class CitationCheckResponse(BaseModel):
+    citation_score: int        # e.g. 0–4
+    max_score: int             # e.g. 4
+    summary: str               # short overall comment
+    issues: List[CitationIssue]

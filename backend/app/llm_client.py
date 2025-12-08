@@ -1,5 +1,3 @@
-# backend/app/llm_client.py  (adjust path as needed)
-
 import os
 import json
 from pathlib import Path
@@ -101,3 +99,78 @@ JSON schema to follow exactly:
             return json.loads(raw[start:end])
         except Exception:
             raise ValueError(f"Gemini returned invalid JSON:\n{raw}")
+
+
+
+def check_citations_with_llm(essay_text: str, style: str | None = None) -> dict:
+    """
+    Use Gemini to review citation practices and return structured JSON.
+    This does NOT do deep plagiarism detection – it focuses on citation quality.
+    """
+    style_hint = style or "any consistent academic style"
+
+    target_schema = """
+{
+  "citation_score": 0,
+  "max_score": 4,
+  "summary": "",
+  "issues": [
+    {
+      "type": "missing_intext",
+      "message": "",
+      "excerpt": "",
+      "suggestion": ""
+    }
+  ]
+}
+"""
+
+    prompt = f"""
+You are a citation and academic integrity helper.
+
+Essay:
+\"\"\"{essay_text}\"\"\"
+
+Expected citation style (if provided): {style_hint}
+
+TASK:
+- Check whether quotations, paraphrases of specific sources, and specific factual claims
+  appear to be properly cited.
+- Look for:
+  - Missing in-text citations next to quotes or very specific information
+  - In-text citations that don't seem to have enough information (e.g., missing year/page in APA)
+  - Clearly inconsistent or messy citation formatting
+- Do NOT try to verify against a large database — just reason about what you see in this essay.
+
+SCORING GUIDELINE:
+- citation_score from 0 to 4:
+  - 4 = Citations are consistently present and well-formatted.
+  - 3 = Mostly good, with some minor issues or inconsistencies.
+  - 2 = Noticeable gaps or inconsistent practice.
+  - 1 = Frequent problems or missing citations.
+  - 0 = Almost no citation practice, or very poor.
+
+INSTRUCTIONS:
+- Return ONLY valid JSON.
+- Follow this schema exactly:
+
+{target_schema}
+"""
+
+    response = client.models.generate_content(
+        model=MODEL_ID,
+        contents=prompt,
+    )
+
+    raw = (response.text or "").strip()
+
+    # Reuse the same robust JSON parsing pattern as your scoring function
+    try:
+        return json.loads(raw)
+    except Exception:
+        try:
+            start = raw.find("{")
+            end = raw.rfind("}") + 1
+            return json.loads(raw[start:end])
+        except Exception:
+            raise ValueError(f"Gemini returned invalid JSON in citation check:\n{raw}")

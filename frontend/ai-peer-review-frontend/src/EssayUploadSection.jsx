@@ -17,9 +17,13 @@
 // function EssayUploadSection({ selectedRubric }) {
 //   const [essayText, setEssayText] = useState('')
 //   const [uploadedFileName, setUploadedFileName] = useState('')
+//   const [isParsing, setIsParsing] = useState(false)
 //   const [isSubmitting, setIsSubmitting] = useState(false)
 //   const [errorMessage, setErrorMessage] = useState('')
 //   const [reviewResult, setReviewResult] = useState(null)
+//   const [runCitationCheck, setRunCitationCheck] = useState(false)
+//   const [citationResult, setCitationResult] = useState(null)
+//   const [isCheckingCitations, setIsCheckingCitations] = useState(false)
 
 //   const fileInputRef = useRef(null)
 //   const resultsRef = useRef(null)
@@ -30,15 +34,56 @@
 //     }
 //   }
 
-//   const handleFileChange = (event) => {
-//     const file = event.target.files?.[0]
-//     if (!file) return
+//   const handleFileChange = async (event) => {
+//   const file = event.target.files?.[0]
+//   if (!file) return
 
-//     setUploadedFileName(file.name)
-//     // For now we just show the file name in the textarea as a placeholder.
-//     setEssayText(`Uploaded file: ${file.name}`)
-//     setErrorMessage('')
+//   // Reset state related to the previous file / result
+//   setUploadedFileName(file.name)
+//   setErrorMessage('')
+//   setEssayText('')
+//   setReviewResult(null)
+
+//   try {
+//     setIsParsing(true)
+
+//     const formData = new FormData()
+//     formData.append('file', file)
+
+//     const response = await fetch('http://localhost:8000/extract-text', {
+//       method: 'POST',
+//       body: formData,
+//     })
+
+//     if (!response.ok) {
+//       const errBody = await response.json().catch(() => null)
+//       const detail =
+//         errBody?.detail || `File parse failed with status ${response.status}`
+//       throw new Error(detail)
+//     }
+
+//     const data = await response.json()
+//     const text = data.text || ''
+
+//     if (!text.trim()) {
+//       throw new Error('No text could be extracted from that file.')
+//     }
+
+//     // Fill textarea with full extracted text
+//     setEssayText(text)
+//   } catch (err) {
+//     console.error(err)
+//     setErrorMessage(
+//       err.message ||
+//         'We had trouble reading that file. Please try another file or paste your text instead.'
+//     )
+//     setUploadedFileName('')
+//     setEssayText('')
+//   } finally {
+//     setIsParsing(false)
 //   }
+// }
+
 
 //   const handleGoClick = async () => {
 //     if (isSubmitting) return
@@ -49,7 +94,7 @@
 //       return
 //     }
 
-//     if (!essayText.trim() && !uploadedFileName) {
+//     if (!essayText.trim()) {
 //       setErrorMessage('Please paste your essay or upload a file before starting.')
 //       return
 //     }
@@ -60,9 +105,8 @@
 
 //     try {
 //       const payload = {
-//         // Uses backend rubric_id from RubricsSection
 //         rubric_id: selectedRubric.rubric_id ?? 'argumentative_essay_v1',
-//         essay_text: essayText || `Uploaded file: ${uploadedFileName}`,
+//         essay_text: essayText,
 //       }
 
 //       const response = await fetch('http://localhost:8000/review', {
@@ -95,18 +139,15 @@
 //     }
 //   }
 
-//   // --- Build quick lookup maps from the LLM result ---
+//   // Build quick lookup maps from the LLM result
 //   const criterionScores = {}
-//   const criterionComments = {}
-
 //   if (reviewResult?.criteria) {
 //     reviewResult.criteria.forEach((c) => {
-//       criterionScores[c.id] = c.score
-//       criterionComments[c.id] = c.comment
+//       const numericScore = Number(c.score)
+//       criterionScores[c.id] = Number.isNaN(numericScore) ? undefined : numericScore
 //     })
 //   }
 
-//   // Convenience alias
 //   const tableRows = selectedRubric?.tableRows || []
 
 //   return (
@@ -118,7 +159,7 @@
 //           <div className="upload-left">
 //             <textarea
 //               className="essay-textarea"
-//               placeholder="Paste your essay text here..."
+//               placeholder="Paste your essay text here, or upload a file to autofill..."
 //               value={essayText}
 //               onChange={(e) => {
 //                 setEssayText(e.target.value)
@@ -132,8 +173,9 @@
 //               type="button"
 //               className="upload-button"
 //               onClick={handleUploadClick}
+//               disabled={isParsing}
 //             >
-//               Upload your essay
+//               {isParsing ? 'Reading file…' : 'Upload your essay'}
 //             </button>
 
 //             {/* Selected file name */}
@@ -160,6 +202,7 @@
 //               type="button"
 //               className="go-button-wrapper"
 //               onClick={handleGoClick}
+//               disabled={isSubmitting || isParsing}
 //             >
 //               <span
 //                 className={`go-button-ring ${
@@ -216,7 +259,6 @@
 //                 </thead>
 //                 <tbody>
 //                   {tableRows.map((row) => {
-//                     // row.id must match the rubric criterion id used in the backend
 //                     const score = criterionScores[row.id]
 
 //                     return (
@@ -295,8 +337,6 @@
 
 
 
-
-
 import { useRef, useState } from 'react'
 
 function getMotivationalMessage(result) {
@@ -320,6 +360,9 @@ function EssayUploadSection({ selectedRubric }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [reviewResult, setReviewResult] = useState(null)
+  const [runCitationCheck, setRunCitationCheck] = useState(false)
+  const [citationResult, setCitationResult] = useState(null)
+  const [isCheckingCitations, setIsCheckingCitations] = useState(false)
 
   const fileInputRef = useRef(null)
   const resultsRef = useRef(null)
@@ -339,6 +382,7 @@ function EssayUploadSection({ selectedRubric }) {
   setErrorMessage('')
   setEssayText('')
   setReviewResult(null)
+  setCitationResult(null)
 
   try {
     setIsParsing(true)
@@ -382,58 +426,84 @@ function EssayUploadSection({ selectedRubric }) {
 
 
   const handleGoClick = async () => {
-    if (isSubmitting) return
+  if (isSubmitting || isParsing) return
 
-    // --- Validation ---
-    if (!selectedRubric) {
-      setErrorMessage('Please choose a rubric before starting.')
-      return
+  // --- Validation ---
+  if (!selectedRubric) {
+    setErrorMessage('Please choose a rubric before starting.')
+    return
+  }
+
+  if (!essayText.trim()) {
+    setErrorMessage('Please paste your essay or upload a file before starting.')
+    return
+  }
+
+  setErrorMessage('')
+  setIsSubmitting(true)
+  setReviewResult(null)
+  setCitationResult(null)
+
+  try {
+    // 1) Call /review as before
+    const payload = {
+      rubric_id: selectedRubric.rubric_id ?? 'argumentative_essay_v1',
+      essay_text: essayText,
     }
 
-    if (!essayText.trim()) {
-      setErrorMessage('Please paste your essay or upload a file before starting.')
-      return
+    const response = await fetch('http://localhost:8000/review', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`)
     }
 
-    setErrorMessage('')
-    setIsSubmitting(true)
-    setReviewResult(null)
+    const data = await response.json()
+    setReviewResult(data)
 
-    try {
-      const payload = {
-        rubric_id: selectedRubric.rubric_id ?? 'argumentative_essay_v1',
-        essay_text: essayText,
+    // Smooth scroll to results (rubric card)
+    setTimeout(() => {
+      if (resultsRef.current) {
+        resultsRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
       }
+    }, 150)
 
-      const response = await fetch('http://localhost:8000/review', {
+    // 2) Optionally call /check-citations
+    if (runCitationCheck) {
+      setIsCheckingCitations(true)
+
+      const citationResponse = await fetch('http://localhost:8000/check-citations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          essay_text: essayText,
+          citation_style: null, // or "APA" / "MLA" later
+        }),
       })
 
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`)
+      if (!citationResponse.ok) {
+        console.error('Citation check failed with status', citationResponse.status)
+        // Don't throw; we still want rubric results to show
+      } else {
+        const citationData = await citationResponse.json()
+        setCitationResult(citationData)
       }
-
-      const data = await response.json()
-      setReviewResult(data)
-
-      // Smooth scroll to results
-      setTimeout(() => {
-        if (resultsRef.current) {
-          resultsRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          })
-        }
-      }, 150)
-    } catch (err) {
-      console.error(err)
-      setErrorMessage('Something went wrong while running the review. Please try again.')
-    } finally {
-      setIsSubmitting(false)
     }
+  } catch (err) {
+    console.error(err)
+    setErrorMessage('Something went wrong while running the review. Please try again.')
+  } finally {
+    setIsSubmitting(false)
+    setIsCheckingCitations(false)
   }
+}
+
 
   // Build quick lookup maps from the LLM result
   const criterionScores = {}
@@ -514,117 +584,195 @@ function EssayUploadSection({ selectedRubric }) {
             {errorMessage && (
               <p className="upload-error-message">{errorMessage}</p>
             )}
+
+            {/* Citation checker toggle */}
+            <div className="citation-toggle">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={runCitationCheck}
+                  onChange={(e) => setRunCitationCheck(e.target.checked)}
+                />{' '}
+                <span className="citation-toggle-label">
+                  Run citation check
+                  {isCheckingCitations && ' (checking...)'}
+                </span>
+              </label>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Results section – visible only when reviewResult is set */}
       {reviewResult && (
-        <section ref={resultsRef} className="results-section">
-          <div className="results-card">
-            <p className="results-heading">
-              {getMotivationalMessage(reviewResult)}
-            </p>
+        <>
+          {/* Main rubric results card */}
+          <section ref={resultsRef} className="results-section">
+            <div className="results-card">
+              <p className="results-heading">
+                {getMotivationalMessage(reviewResult)}
+              </p>
 
-            <h3 className="results-rubric-title">
-              {selectedRubric?.name ?? 'Argumentative Essay Rubric'}
-            </h3>
+              <h3 className="results-rubric-title">
+                {selectedRubric?.name ?? 'Argumentative Essay Rubric'}
+              </h3>
 
-            <p
-              style={{
-                textAlign: 'center',
-                marginBottom: '1rem',
-                color: '#4b5563',
-              }}
-            >
-              Overall score: <strong>{reviewResult.overall_score}</strong> /{' '}
-              {reviewResult.max_score}
-            </p>
+              <p
+                style={{
+                  textAlign: 'center',
+                  marginBottom: '1rem',
+                  color: '#4b5563',
+                }}
+              >
+                Overall score: <strong>{reviewResult.overall_score}</strong> /{' '}
+                {reviewResult.max_score}
+              </p>
 
-            {/* Results table driven by selectedRubric.tableRows */}
-            <div className="results-table-wrapper">
-              <table className="rubric-table results-table">
-                <thead>
-                  <tr>
-                    <th>Criterion</th>
-                    <th>Excellent (4)</th>
-                    <th>Proficient (3)</th>
-                    <th>Developing (2)</th>
-                    <th>Beginning (1–0)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableRows.map((row) => {
-                    const score = criterionScores[row.id]
+              {/* Results table driven by selectedRubric.tableRows */}
+              <div className="results-table-wrapper">
+                <table className="rubric-table results-table">
+                  <thead>
+                    <tr>
+                      <th>Criterion</th>
+                      <th>Excellent (4)</th>
+                      <th>Proficient (3)</th>
+                      <th>Developing (2)</th>
+                      <th>Beginning (1–0)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tableRows.map((row) => {
+                      const score = criterionScores[row.id]
 
-                    return (
-                      <tr key={row.id || row.criterion}>
-                        <td className="rubric-criterion-cell">
-                          {row.criterion}
-                        </td>
+                      return (
+                        <tr key={row.id || row.criterion}>
+                          <td className="rubric-criterion-cell">
+                            {row.criterion}
+                          </td>
 
-                        {/* Excellent (4) */}
-                        <td
-                          className={
-                            score === 4 ? 'rubric-score-highlight' : ''
-                          }
-                        >
-                          {row.excellent}
-                        </td>
+                          {/* Excellent (4) */}
+                          <td
+                            className={
+                              score === 4 ? 'rubric-score-highlight' : ''
+                            }
+                          >
+                            {row.excellent}
+                          </td>
 
-                        {/* Proficient (3) */}
-                        <td
-                          className={
-                            score === 3 ? 'rubric-score-highlight' : ''
-                          }
-                        >
-                          {row.proficient}
-                        </td>
+                          {/* Proficient (3) */}
+                          <td
+                            className={
+                              score === 3 ? 'rubric-score-highlight' : ''
+                            }
+                          >
+                            {row.proficient}
+                          </td>
 
-                        {/* Developing (2) */}
-                        <td
-                          className={
-                            score === 2 ? 'rubric-score-highlight' : ''
-                          }
-                        >
-                          {row.developing}
-                        </td>
+                          {/* Developing (2) */}
+                          <td
+                            className={
+                              score === 2 ? 'rubric-score-highlight' : ''
+                            }
+                          >
+                            {row.developing}
+                          </td>
 
-                        {/* Beginning (1–0) */}
-                        <td
-                          className={
-                            score === undefined || score <= 1
-                              ? 'rubric-score-highlight'
-                              : ''
-                          }
-                        >
-                          {row.beginning}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+                          {/* Beginning (1–0) */}
+                          <td
+                            className={
+                              score === undefined || score <= 1
+                                ? 'rubric-score-highlight'
+                                : ''
+                            }
+                          >
+                            {row.beginning}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Three-paragraph feedback block */}
+              <div className="results-advice-block">
+                <p className="results-advice">
+                  <strong>Overall impression:</strong>{' '}
+                  {reviewResult.overall_impression}
+                </p>
+                <p className="results-advice">
+                  <strong>Key areas to strengthen:</strong>{' '}
+                  {reviewResult.improvement_summary}
+                </p>
+                <p className="results-advice">
+                  <strong>Example next steps:</strong>{' '}
+                  {reviewResult.next_steps_example}
+                </p>
+              </div>
             </div>
+          </section>
 
-            {/* Three-paragraph feedback block */}
-            <div className="results-advice-block">
-              <p className="results-advice">
-                <strong>Overall impression:</strong>{' '}
-                {reviewResult.overall_impression}
-              </p>
-              <p className="results-advice">
-                <strong>Key areas to strengthen:</strong>{' '}
-                {reviewResult.improvement_summary}
-              </p>
-              <p className="results-advice">
-                <strong>Example next steps:</strong>{' '}
-                {reviewResult.next_steps_example}
-              </p>
-            </div>
-          </div>
-        </section>
+          {/* Citation results card – separate block below */}
+          {citationResult && (
+            <section className="results-section">
+              <div className="results-card citation-results-card">
+                <h3 className="results-rubric-title">
+                  Citation &amp; Academic Integrity
+                </h3>
+
+                {/* Horizontal progress bar */}
+                <div className="citation-score-bar-wrapper">
+                  <div className="citation-score-bar">
+                    <div
+                      className="citation-score-bar-fill"
+                      style={{
+                        width: `${
+                          (citationResult.citation_score /
+                            citationResult.max_score) *
+                          100
+                        }%`,
+                      }}
+                    />
+                    <span className="citation-score-bar-label">
+                      {citationResult.citation_score} / {citationResult.max_score}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Summary and issue list */}
+                <p className="results-advice" style={{ marginTop: '1rem' }}>
+                  <strong>Summary:</strong> {citationResult.summary}
+                </p>
+
+                {citationResult.issues && citationResult.issues.length > 0 ? (
+                  <ul className="citation-issues-list">
+                    {citationResult.issues.map((issue, idx) => (
+                      <li key={idx} className="citation-issue-item">
+                        <strong>{issue.type}</strong>: {issue.message}
+                        {issue.excerpt && (
+                          <div className="citation-issue-excerpt">
+                            <em>Excerpt:</em> “{issue.excerpt}”
+                          </div>
+                        )}
+                        {issue.suggestion && (
+                          <div className="citation-issue-suggestion">
+                            <em>Suggestion:</em> {issue.suggestion}
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="results-advice">
+                    No major citation issues detected. Keep up the good practices!
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
+        </>
       )}
+
     </>
   )
 }

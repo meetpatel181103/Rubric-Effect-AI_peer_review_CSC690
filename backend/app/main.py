@@ -3,9 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette import status
 
 from .file_parsers import extract_text_from_file, UnsupportedFileTypeError
-from .schemas import ReviewRequest, ReviewResponse, CriterionResult
+from .schemas import (
+    ReviewRequest,
+    ReviewResponse,
+    CriterionResult,
+    CitationCheckRequest,
+    CitationCheckResponse,
+)
 from .rubrics import get_rubric_by_id
-from .llm_client import score_essay_with_rubric  # UPDATED
+from .llm_client import score_essay_with_rubric, check_citations_with_llm
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -195,3 +201,39 @@ async def extract_text(file: UploadFile = File(...)):
             detail="Something went wrong while reading the file. "
                    "Please try another file or paste your text instead.",
         ) from e
+
+
+
+@app.post("/check-citations", response_model=CitationCheckResponse)
+async def check_citations(payload: CitationCheckRequest):
+    """
+    Run a citation-format / academic integrity helper on the essay text.
+    This does NOT check against a large plagiarism database; it only reasons
+    about citation practice inside this essay.
+    """
+    if not payload.essay_text.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Essay text is required for citation checking.",
+        )
+
+    try:
+        result = check_citations_with_llm(
+            essay_text=payload.essay_text,
+            style=payload.citation_style,
+        )
+    except ValueError as e:
+        # JSON or schema mismatch from LLM
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="The citation checker returned an unexpected response.",
+        ) from e
+    except Exception as e:
+        # Network/API/etc
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="The citation checker is currently unavailable. Please try again.",
+        ) from e
+
+    # Pydantic will validate shape; if it's wrong, this will raise and become 500
+    return CitationCheckResponse(**result)
